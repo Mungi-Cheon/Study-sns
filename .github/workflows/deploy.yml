@@ -1,7 +1,9 @@
-name: Deploy
+name: Java Ci With Gradle
 
 on:
   push:
+    branches: [ "main" ]
+  pull_request:
     branches: [ "main" ]
 
 permissions: write-all
@@ -23,45 +25,10 @@ jobs:
       - name: Add permission
         run: chmod +x gradlew
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Cache node modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run ESLint and automatically fix problems
-        run: npx eslint --fix src/
-
       - name: Build with Gradle
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25
         with:
           arguments: build -Pprofile=dev
-          env:
-            CI:false
-
-      - name: 테스트 결과 등록
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: '**/build/test-results/test/TEST-*.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 테스트 실패 Lines 등록
-        uses: mikepenz/action-junit-report@v3
-        if: always()
-        with:
-          report_paths: '**/build/test-results/test/TEST-*.xml'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: SSH Agent 설정
         uses: webfactory/ssh-agent@v0.5.3
@@ -82,7 +49,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEVELOP_USERNAME }}@${{ secrets.DEVELOP_HOST }} << EOF
             pkill -f 'Study-sns-0.0.1-SNAPSHOT.jar' || true
-            cd ~/app/study-sns
+            cd ~/app/Study-sns
             nohup java -jar -Dspring.profiles.active=develop Study-sns-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
           EOF
         env:
