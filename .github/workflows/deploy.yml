@@ -47,7 +47,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEVELOP_USERNAME }}@${{ secrets.DEVELOP_HOST }} << EOF
             pkill -f 'Study-sns-0.0.1-SNAPSHOT.jar' || true
-            cd ~/app/Study-sns
+            cd ~/app/study-sns
             nohup java -jar -Dspring.profiles.active=develop Study-sns-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
           EOF
         env:
