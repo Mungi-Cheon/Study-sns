@@ -1,9 +1,7 @@
-name: Java Ci With Gradle
+name: Deploy
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
     branches: [ "main" ]
 
 permissions: write-all
